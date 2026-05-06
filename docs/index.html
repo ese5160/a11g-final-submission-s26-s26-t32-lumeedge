@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LumeEdge | LLM Smart Home Agent</title>
+  <style>
+    :root {
+      --ink: #182025;
+      --muted: #60707a;
+      --paper: #fbfaf7;
+      --line: #d9e1df;
+      --mint: #49b89c;
+      --blue: #2f82c6;
+      --coral: #f26f55;
+      --amber: #f4bf4f;
+      --deep: #173b4f;
+      --white: #ffffff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(180deg, rgba(73, 184, 156, 0.12), transparent 360px),
+        var(--paper);
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(24, 32, 37, 0.08);
+      background: rgba(251, 250, 247, 0.9);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 68px;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--mint), var(--blue));
+      font-weight: 900;
+    }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .navlinks a:hover {
+      color: var(--ink);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+      align-items: center;
+      gap: 48px;
+      min-height: calc(100vh - 68px);
+      padding: 62px 0 42px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 18px;
+      color: var(--deep);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--coral);
+      box-shadow: 15px 0 0 var(--amber), 30px 0 0 var(--mint);
+      margin-right: 30px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 22px;
+      font-size: clamp(3rem, 7vw, 6.9rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 620px;
+      margin-bottom: 30px;
+      color: #3e4d55;
+      font-size: clamp(1.08rem, 1.6vw, 1.32rem);
+      line-height: 1.65;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      font-weight: 800;
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 620px;
+    }
+
+    .metric {
+      min-height: 102px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1.35rem;
+      color: var(--deep);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .hero-visual {
+      position: relative;
+      align-self: stretch;
+      display: grid;
+      gap: 12px;
+      align-content: top;
+      min-height: 700px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #eef4f1;
+      box-shadow: 0 24px 70px rgba(23, 59, 79, 0.24);
+      padding: 24px 18px 160px;
+    }
+
+    .hero-visual img {
+      height: auto;
+      max-height: 680px;
+      object-fit: contain;
+    }
+
+    .caption-strip {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+    }
+
+    .caption-strip b {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .caption-strip span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .status-pill {
+      white-space: nowrap;
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: var(--white);
+      background: var(--mint);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    section {
+      padding: 82px 0;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.76fr) minmax(280px, 0.6fr);
+      gap: 42px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: clamp(2rem, 4vw, 4.1rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .section-head p,
+    .copy {
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.65;
+    }
+
+    .system-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature {
+      min-height: 230px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .feature .icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      margin-bottom: 18px;
+      border-radius: 8px;
+      color: var(--white);
+      background: var(--blue);
+      font-weight: 900;
+    }
+
+    .feature:nth-child(2) .icon {
+      background: var(--mint);
+    }
+
+    .feature:nth-child(3) .icon {
+      background: var(--coral);
+    }
+
+    .feature:nth-child(4) .icon {
+      background: var(--amber);
+      color: var(--ink);
+    }
+
+    .feature h3 {
+      margin-bottom: 10px;
+      font-size: 1.18rem;
+    }
+
+    .feature p {
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .flow-band {
+      background: var(--deep);
+      color: var(--white);
+    }
+
+    .flow-band .section-head p,
+    .flow-band .copy {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      counter-reset: step;
+    }
+
+    .step {
+      position: relative;
+      min-height: 190px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .step::before {
+      counter-increment: step;
+      content: "0" counter(step);
+      display: inline-flex;
+      margin-bottom: 22px;
+      color: var(--amber);
+      font-weight: 900;
+    }
+
+    .step h3 {
+      margin-bottom: 9px;
+      font-size: 1.05rem;
+    }
+
+    .step p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .photo {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      margin: 0;
+      min-width: 0;
+    }
+
+    .photo.large {
+      min-height: 0;
+    }
+
+    .photo img {
+      width: 100%;
+      height: auto;
+      max-height: 620px;
+      object-fit: contain;
+      background: #eef4f1;
+    }
+
+    .photo.large img {
+      max-height: none;
+    }
+
+    .photo-copy {
+      padding: 18px;
+    }
+
+    .photo-copy h3 {
+      margin-bottom: 7px;
+      font-size: 1.15rem;
+    }
+
+    .photo-copy p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .interface {
+      display: grid;
+      grid-template-columns: 0.62fr 1fr;
+      gap: 42px;
+      align-items: center;
+    }
+
+    .phone-shot {
+      max-width: 360px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 20px 60px rgba(24, 32, 37, 0.12);
+    }
+
+    .interface-list {
+      display: grid;
+      gap: 12px;
+      margin: 28px 0 0;
+    }
+
+    .interface-item {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .interface-item b {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .interface-item span {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .dot {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(73, 184, 156, 0.16);
+      color: var(--deep);
+      font-weight: 900;
+    }
+
+    .cta {
+      padding-bottom: 90px;
+    }
+
+    .cta-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 28px;
+      align-items: center;
+      padding: 34px;
+      border-radius: 8px;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--deep), #2b6c7c 58%, var(--mint));
+    }
+
+    .cta-panel h2 {
+      margin-bottom: 12px;
+      font-size: clamp(2rem, 3.2vw, 3.3rem);
+    }
+
+    .cta-panel p {
+      max-width: 720px;
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.6;
+    }
+
+    footer {
+      padding: 26px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .section-head,
+      .interface,
+      .gallery,
+      .cta-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 42px;
+      }
+
+      .system-grid,
+      .pipeline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .caption-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .shell {
+        width: min(100% - 28px, 1160px);
+      }
+
+      .nav {
+        min-height: 62px;
+      }
+
+      .navlinks {
+        display: none;
+      }
+
+      h1 {
+        font-size: clamp(2.6rem, 16vw, 4.2rem);
+      }
+
+      .metrics,
+      .system-grid,
+      .pipeline {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        min-height: 430px;
+      }
+
+      section {
+        padding: 58px 0;
+      }
+
+      .photo.large {
+        min-height: auto;
+      }
+
+      .cta-panel {
+        padding: 24px;
+      }
+
+      
+    }
+    .long-image-frame {
+    width: 80%;
+    max-width: 800px; 
+    margin: 40px auto;
+    max-height: 500px; 
+    overflow-y: auto; 
+    overflow-x: auto;  
+    
+
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #eef4f1;
+    box-shadow: 0 16px 40px rgba(24, 32, 37, 0.06); 
+    
+  
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+
+
+  .long-image-frame::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .long-image-frame::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .long-image-frame::-webkit-scrollbar-thumb {
+    background-color: var(--line);
+    border-radius: 8px;
+  }
+
+  .long-image-frame img {
+    display: block;
+    width: 100%;  
+    height: auto;  
+    margin: 0;
+  }
+
+
+  .long-image-frame.panorama img {
+    width: auto;
+    height: 600px; 
+    max-width: max-content; 
+  }
+
+
+    .scrolling-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 24px; 
+    -webkit-overflow-scrolling: touch; 
+    
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+
+  .scrolling-wrapper::-webkit-scrollbar {
+    height: 6px;
+  }
+  .scrolling-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrolling-wrapper::-webkit-scrollbar-thumb {
+    background-color: var(--line);
+    border-radius: 8px;
+  }
+
+  .scrolling-gallery {
+    display: flex;
+    gap: 18px;
+    width: max-content;
+    
+  }
+
+  .gallery-card {
+    display: flex;
+    flex-direction: column;
+    width: 320px; 
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--white);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .gallery-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(24, 32, 37, 0.08);
+  }
+
+  .gallery-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    background: #eef4f1; 
+  }
+
+  .gallery-card-copy {
+    padding: 16px 18px;
+  }
+
+  .gallery-card-copy h3 {
+    margin: 0;
+    /* margin-bottom: 8px; */
+    font-size: 1.12rem;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .gallery-card-copy p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .sub-section-header {
+  margin-top: 64px;
+  margin-bottom: 32px;
+  border-top: 1px solid var(--line);
+  padding-top: 48px;
+}
+.sub-section-header h3 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  margin-bottom: 12px;
+}
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; 
+  height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  box-shadow: 0 16px 40px rgba(24, 32, 37, 0.06);
+  margin-top: 24px;
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+  @media (max-width: 680px) {
+    .gallery-card {
+      width: 280px;
+    }
+  }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="shell nav" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="LumeEdge home">
+        <span class="mark">L</span>
+        <span>LumeEdge</span>
+      </a>
+      <div class="navlinks">
+        <a href="#system">Features</a>
+        <a href="#intelligence">Workflow</a>
+        <a href="#hardware">Hardware</a>
+        <a href="#interface">Interface</a>
+        <a href="#challenge">Challenge</a>
+        <a href="#future">Future Plan</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="shell hero">
+      <div>
+        <p class="eyebrow">LLM-powered smart home prototype</p>
+        <h1>LumeEdge makes a small room think for itself.</h1>
+        <p class="lead">
+          A connected home agent that reads temperature, humidity, brightness, time, weather, and personal preferences, then uses an LLM to decide how much light and ventilation the space needs.
+        </p>
+        <div class="actions">
+          <a class="button" href="https://github.com/ese5160/final-project-firmware-s26-t32-lumeedge" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
+  <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+  </svg>
+  GitHub
+</a>
+
+          <a class="button secondary" href="#system">Features</a>
+          <a class="button secondary" href="#intelligence">About Workflow</a>
+          <a class="button secondary" href="#hardware">About Hardware</a>
+          <a class="button secondary" href="#interface">About Cloud UI</a>
+        </div>
+        <div class="metrics" aria-label="Project highlights">
+          <div class="metric">
+            <strong>2 outputs</strong>
+            <span>Adaptive brightness and motor-driven ventilation.</span>
+          </div>
+          <div class="metric">
+            <strong>5 inputs</strong>
+            <span>Temperature, humidity, ambient light, time and weather info.</span>
+          </div>
+          <div class="metric">
+            <strong>OTA ready</strong>
+            <span>Firmware update support for fast iteration after deployment.</span>
+          </div>
+        </div>
+      </div>
+
+      <figure class="hero-visual" aria-label="LumeEdge hardware prototype with display">
+
+
+        <img src="assets/hardware-front.JPEG" alt="LumeEdge prototype board, battery, and display mounted on a tissue box">
+
+        <img src="assets/prototype-inside.JPEG" alt="back of box">
+
+        <div class="video-wrapper" style="margin-top: 24px; border-radius: 8px; overflow: hidden; position: relative; padding-bottom: 56.25%; height: 0;">
+        <iframe 
+          src="https://www.youtube.com/embed/i7tSZm3Seq0" 
+          title="LumeEdge Project Demo" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen>
+        </iframe>
+        </div>
+        <figcaption class="caption-strip">
+          <span><b>Real hardware, real decisions.</b> The video shows how the system works.</span>
+         
+          <a href="https://youtu.be/i7tSZm3Seq0" class="status-pill" target="_blank" style="display: inline-flex; align-items: center; gap: 6px;">
+  <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.052-.072 1.972l-.008.104-.022.26-.01.104c-.048.519-.119 1.023-.22 1.402a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z"/>
+  </svg>Goto YouTube</a>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section id="system" class="shell">
+      <div class="section-head">
+        <h2>A complete edge-to-cloud home agent.</h2>
+        <p>
+          LumeEdge combines embedded sensing, Node-RED orchestration, an LLM-powered reasoning service, and physical actuators into one compact smart-home demonstration.
+        </p>
+      </div>
+      <div class="system-grid">
+        <article class="feature">
+          <span class="icon">S</span>
+          <h3>Sensor awareness</h3>
+          <p>Environmental data flows from the embedded board into the control service, giving the agent a live view of comfort and lighting conditions.</p>
+        </article>
+        <article class="feature">
+          <span class="icon">L</span>
+          <h3>LLM reasoning</h3>
+          <p>The model converts user preference, sensor readings, time, and weather context into explainable control decisions.</p>
+        </article>
+        <article class="feature">
+          <span class="icon">P</span>
+          <h3>Polished UI</h3>
+          <p>The screen presents everything clearly and accessibly, including battery level, Wi-Fi status, sensor readings, and the AI’s reasoning.</p>
+        </article>
+        <article class="feature">
+          <span class="icon">U</span>
+          <h3>User control</h3>
+          <p>The dashboard supports preference entry, manual override, LLM decision display, and OTA update access from a mobile-friendly interface.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="intelligence" class="flow-band">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Designed around explainable autonomy.</h2>
+          <p>
+            Instead of only toggling devices, LumeEdge tells the user why it adjusted the environment. The same loop can support comfort, energy savings, and remote maintenance.
+          </p>
+        </div>
+        <div class="pipeline">
+          <article class="step">
+            <h3>Sense</h3>
+            <p>The embedded system reports indoor temperature, humidity, and brightness.</p>
+          </article>
+          <article class="step">
+            <h3>Personalize</h3>
+            <p>The dashboard collects comfort targets, day and night light preferences, and user-defined instructions.</p>
+          </article>
+          <article class="step">
+            <h3>Reason</h3>
+            <p>The LLM evaluates conditions with time and weather tools, then returns brightness, ventilation, and a concise reason.</p>
+          </article>
+          <article class="step">
+            <h3>Control</h3>
+            <p>The service exposes clean decision endpoints for Node-RED and firmware to consume.</p>
+          </article>
+          <article class="step">
+            <h3>Actuate</h3>
+            <p>The MCU receives control signals from Node-RED and executes them through its internal logic.</p>
+          </article>
+          <article class="step">
+            <h3>Update</h3>
+            <p>OTA support keeps the firmware iteration loop open after the prototype is assembled.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="hardware" class="shell">
+      <div class="section-head">
+        <h2>Built as a physical smart-room model.</h2>
+        <p>
+          The prototype packages sensors, display, battery, wiring, lighting, and ventilation into a tangible room-scale demonstration, making the AI output visible and testable.
+        </p>
+      </div>
+      
+      <div class="actions">
+      <a class="button" href="https://github.com/ese5160/final-project-firmware-s26-t32-lumeedge/tree/main/final/wifi_http_otaf_soc/cmake_gcc/build/base" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
+  <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+  </svg>
+  GitHub Frimware
+</a>
+<a class="button" href="https://upenn-eselabs.365.altium.com/designs/5DE4810D-8CC0-4C42-B640-A4C59501405E?OpenedFrom=AD&variant=[No+Variations]&activeDocumentId=Top20Level.SchDoc(1)&activeView=SCH&location=[1,96.56,26.5,32.18]#design" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
+
+  Altium Project
+</a>
+
+</div>
+
+      <figure class="photo" style="margin-bottom: 42px;">
+        <img src="assets/HARDWARE DIAGRAM.drawio.png" alt="Inside view of the LumeEdge prototype with wiring, fan, LEDs, and control board">
+        <figcaption class="photo-copy">
+          <h3>System Block Diagram</h3>
+          <p>The component structure and interconnections</p>
+        </figcaption>
+      </figure>
+
+      <div class="scrolling-wrapper">
+        <div class="scrolling-gallery">
+          <article class="gallery-card">
+            <img src="assets/PCB2D.png" alt="">
+            <div class="gallery-card-copy">
+              <h3>PCB design in 2D view</h3>
+            </div>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/PCB3D1.png" alt="">
+            <div class="gallery-card-copy">
+              <h3>PCB Front View (Model)</h3>
+            </div>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/PCBREAL1.JPEG" alt="">
+            <div class="gallery-card-copy">
+              <h3>PCB Front View (Physical)</h3>
+            </div>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/PCB3D2.png" alt="">
+            <div class="gallery-card-copy">
+              <h3>PCB Back View (Model)</h3>
+            </div>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/PCBREAL2.JPEG" alt="">
+            <div class="gallery-card-copy">
+              <h3>PCB Back View (Physical)</h3>
+            </div>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/SCREEN.JPEG" alt="">
+            <div class="gallery-card-copy">
+              <h3>Screen UI</h3>
+            </div>
+          </article>
+          <article class="gallery-card">
+            <img src="assets/THERMO.jpeg" alt="">
+            <div class="gallery-card-copy">
+              <h3>Thermo Image</h3>
+            </div>
+          </article>
+        </div>
+      </div>
+
+
+    </section>
+
+    <section id="interface" class="shell">
+      <div > 
+        <p class="eyebrow">Node-RED dashboard</p>
+        <h2>Preference-driven control from any browser.</h2>
+        
+        <p class="copy">
+          The UI lets users set comfort targets, submit personal preferences, switch to manual control, inspect the LLM's chosen ventilation and brightness, and trigger an OTA update when firmware changes are ready.
+        </p>
+
+
+        
+        <div class="long-image-frame">
+          <img src="assets/dashboard-ui.jpg.JPEG" alt="Node Red Dashboard">
+        </div>
+
+                        <div class="actions">
+        <a class="button" href="http://4.154.160.184:1880/" target="_blank">Node-RED Source</a>
+        <a class="button" href="http://4.154.160.184:1880/dashboard" target="_blank">Node-RED Dashboard</a>
+        <a class="button" href="https://github.com/ese5160/final-project-firmware-s26-t32-lumeedge/tree/main/Node-RED" target="_blank" style="display: inline-flex; align-items: center; gap: 8px;">
+  <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+  </svg>
+  LLM and Node-RED Backend Code
+</a>
+      </div>
+
+        <div class="interface-list">
+          <div class="interface-item">
+            <span class="dot">1</span>
+            <span><b>Preference form</b>Temperature, humidity, API frequency, day/night lighting, and personal instructions feed the control loop.</span>
+          </div>
+          <div class="interface-item">
+            <span class="dot">2</span>
+            <span><b>Manual override</b>Users can directly set brightness and ventilation when they want deterministic control.</span>
+          </div>
+          <div class="interface-item">
+            <span class="dot">3</span>
+            <span><b>Transparent output</b>The dashboard shows the LLM's selected values and a short natural-language reason.</span>
+          </div>
+        </div>
+
+        <figure class="photo" style="margin-top: 32px;">
+          <img src="assets/NODE-RED.png" alt="How Node-RED works">
+          <figcaption class="photo-copy">
+            <h3>How does it work?</h3>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="challenge" class="shell">
+      <div class="section-head">
+        <h2>Challenges and Learning</h2>
+        <p>
+          In the process of developing the LumeEdge project, we encountered many challenges and learned a great deal.
+        </p>
+      </div>
+      <div class="system-grid">
+        <article class="feature">
+          <span class="icon">C</span>
+          <h3>Complex SDK Libraries</h3>
+          <p>We strengthened our ability to read technical documentation and navigate source code efficiently.</p>
+        </article>
+        <article class="feature">
+          <span class="icon">A</span>
+          <h3>AI Integration</h3>
+          <p>We deepened our understanding of AI workflows and improved our ability to integrate them into real-world systems.</p>
+        </article>
+        <article class="feature">
+          <span class="icon">P</span>
+          <h3>PCB Design</h3>
+          <p>We learned how to design high-quality PCBs and validate them through testing.</p>
+        </article>
+        <article class="feature">
+          <span class="icon">E</span>
+          <h3>Engineering Management</h3>
+          <p>We gained experience in managing complex engineering projects and collaborating effectively as a team.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell cta" id = "future">
+      <div class="cta-panel">
+        <div>
+          <h2>Future Plan:</h2>
+          <p>
+            Looking ahead, we plan to further miniaturize the PCB to fit within the footprint of a standard wall outlet. We will also design a custom 3D-printed enclosure that blends naturally with the wall environment, making the device easy to install, visually unobtrusive, and suitable for everyday use in real-world settings.
+          </p>
+        </div>
+        <a class="button" href="#top">Back to top</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">LumeEdge final project · LLM smart home system · Node-RED + embedded firmware</div>
+  </footer>
+
+  <script>
+  const scrollContainers = document.querySelectorAll('.scrolling-wrapper');
+
+  scrollContainers.forEach(container => {
+    container.addEventListener('wheel', (evt) => {
+      if (evt.deltaY !== 0) {
+        evt.preventDefault(); 
+        container.scrollLeft += evt.deltaY; 
+      }
+    }, { passive: false }); 
+  });
+</script>
+
+</body>
+</html>
